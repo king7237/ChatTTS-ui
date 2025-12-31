@@ -62,8 +62,8 @@ else:
 
 if not shutil.which("ffmpeg"):
     print("请先安装ffmpeg")
-    time.sleep(60)
-    exit()
+##    time.sleep(60)
+##    exit()
 
 
 chat = ChatTTS.Chat()
@@ -312,7 +312,8 @@ def tts():
                 + f"-{i}-{j}.wav"
             )
             filename_list.append(filename)
-            torchaudio.save(WAVS_DIR + "/" + filename, torch.from_numpy(w).unsqueeze(0), 24000)
+            sf.write(WAVS_DIR + "/" + filename, w, 24000)
+            ## torchaudio.save(WAVS_DIR + "/" + filename, torch.from_numpy(w).unsqueeze(0), 24000)
 
     txt_tmp = "\n".join([f"file '{WAVS_DIR}/{it}'" for it in filename_list])
     txt_name = f"{time.time()}.txt"
@@ -326,7 +327,7 @@ def tts():
     try:
         subprocess.run(
             [
-                "ffmpeg",
+                r"D:\workspace\python\ChatTTS-ui\ffmpeg\bin\ffmpeg.exe",
                 "-hide_banner",
                 "-ignore_unknown",
                 "-y",
@@ -400,7 +401,10 @@ def clear_wavs():
 try:
     host = WEB_ADDRESS.split(":")
     print(f"Start:{WEB_ADDRESS}")
+    # 如果你想让打开网页的线程也尝试用局域网IP打开，可以修改下面这行
+    # 但通常浏览器自动用localhost打开即可，所以这行可保持不变
     threading.Thread(target=utils.openweb, args=(f"http://{WEB_ADDRESS}",)).start()
-    serve(app, host=host[0], port=int(host[1]))
+    # 关键修改：将 host[0] (即127.0.0.1) 改为 '0.0.0.0'
+    serve(app, host='0.0.0.0', port=int(host[1]))
 except Exception as e:
     print(e)
